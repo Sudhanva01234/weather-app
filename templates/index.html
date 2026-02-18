@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Explorer</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🌍 Weather Explorer</h1>
+
+    <!-- Search -->
+    <div class="search-section">
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Search any city...">
+            <button onclick="searchCity()">Search</button>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Weather -->
+    <div id="currentWeather" class="card"></div>
+
+    <h2>7-Day Forecast</h2>
+    <div id="forecast" class="forecast-container"></div>
+
+</div>
+
+<!-- Chat Button -->
+<button class="chat-btn" onclick="toggleChat()">💬</button>
+
+<!-- Chat Box -->
+<div id="chatBox" class="chat-box hidden">
+    <div id="chatMessages" class="chat-messages"></div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Ask about rain, temperature...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
