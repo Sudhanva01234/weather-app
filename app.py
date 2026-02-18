@@ -4,6 +4,9 @@ from flask import Flask, render_template, request, jsonify, session
 from dotenv import load_dotenv
 from groq import Groq
 
+# =========================
+# LOAD ENV
+# =========================
 load_dotenv()
 
 app = Flask(__name__)
@@ -23,7 +26,9 @@ if not GROQ_API_KEY:
 
 client = Groq(api_key=GROQ_API_KEY)
 
-
+# =========================
+# HOME
+# =========================
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -114,21 +119,22 @@ def chat():
         return jsonify({"reply": "Please search for a city first."})
 
     # =========================
-    # HARD WEATHER FILTER
+    # SMART WEATHER FILTER
     # =========================
     allowed_keywords = [
         "weather", "temperature", "rain", "humidity", "wind",
         "forecast", "climate", "hot", "cold", "storm", "snow",
-        "heat", "umbrella", "jacket", "travel",
-        "today", "tomorrow", "week", "sunny", "cloudy"
+        "heat", "sunny", "cloudy", "umbrella", "jacket",
+        "clothes", "wear", "pack", "trip", "travel", "plan", "planning",
+        "today", "tomorrow", "week"
     ]
 
     if not any(word in message for word in allowed_keywords):
         return jsonify({
-            "reply": "I can only help with weather-related questions."
+            "reply": "I can only help with weather and travel-related questions."
         })
 
-    # Fetch current weather for AI context
+    # Fetch live weather
     current_url = f"https://api.openweathermap.org/data/2.5/weather?q={last_city}&units=metric&appid={OPENWEATHER_API_KEY}"
     response = requests.get(current_url)
 
@@ -153,13 +159,17 @@ Condition: {current_data['weather'][0]['description']}
                     "role": "system",
                     "content": """
 You are a strict weather assistant.
-You ONLY answer questions related to weather,
-temperature, rain, humidity, wind, forecasts,
-clothing suggestions based on weather,
-and travel advice based on weather.
 
-If the question is not related to weather,
-respond with:
+You ONLY answer questions related to:
+- weather
+- forecasts
+- rain, humidity, wind
+- temperature
+- clothing suggestions based on weather
+- travel advice based on weather
+
+If the user asks something unrelated to weather,
+reply exactly:
 "I can only help with weather-related questions."
 """
                 },
@@ -168,7 +178,7 @@ respond with:
                     "content": f"{weather_context}\n\nUser question: {message}"
                 }
             ],
-            temperature=0.5,
+            temperature=0.4,
         )
 
         reply = completion.choices[0].message.content
@@ -183,5 +193,8 @@ respond with:
     return jsonify({"reply": reply})
 
 
+# =========================
+# RUN
+# =========================
 if __name__ == "__main__":
     app.run(debug=True)
